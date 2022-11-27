@@ -11,8 +11,7 @@ It is a simple python application that "skids" or simply, downloads off other Gi
 ## Current Features:
 - [x] *Download All Repos
 - [x] **Download Specific Named Repos
-- [ ] *Download Specific Named Repos
-- [ ] **Download by File Extension
+- [ ] **Download by File Extension 
 - [ ] *Download by File Extension
 - [ ] **Repost
 - [ ] Proxy Support
