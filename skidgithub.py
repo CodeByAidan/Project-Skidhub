@@ -1,5 +1,6 @@
-import json
+import json  
 import logging, verboselogs
+import shutil
 import os
 import sys
 import time
@@ -9,6 +10,7 @@ import requests
 import yaml
 import textwrap
 
+version = "1.0"
 
 #TODO: add a help menu
 #TODO: add a credits menu
@@ -16,14 +18,15 @@ import textwrap
 #TODO: add a search menu (search for users, repos, files, etc)
 #TODO: add a "download" menu
 
-# check if the user is running the most recent version of the script
 def check_version():
-    # get the latest version from the github api
-    latest_version = requests.get("https://api.github.com/repos/livxy/skidgithub/releases/latest").json()["tag_name"]
-    # check if the latest version is the same as the current version
+    global version
+    latest_version = requests.get("https://api.github.com/repos/livxy/Project-Skidhub/releases/latest").json()["tag_name"]
+    latest_version_link = requests.get("https://api.github.com/repos/livxy/Project-Skidhub/releases/latest").json()["html_url"]
     if latest_version != version:
-        # if the versions are not the same, print a message
-        print(f"{colorama.Fore.RED}You are not running the latest version of skidgithub!{colorama.Fore.RESET}
+        print(f"{colorama.Fore.RED}You are not running the latest version of Project-Skidhub!{colorama.Fore.RESET}")
+        print(f"{colorama.Fore.RED}Please update to the latest version!{colorama.Fore.RESET}")
+        print(f"{colorama.Fore.RED}v{latest_version} -> {latest_version_link}{colorama.Fore.RESET}")
+        sys.exit()
 
 if not os.path.isdir("settings/"): os.makedirs("settings/");
 if not os.path.isfile("settings/config.yml"):
@@ -61,7 +64,7 @@ def skidgithub():
             8""88888P'  o888o o888o o888o `Y8bod88P" o888o o888o  `V88V"V8P'  `Y8bod8P'                                                                                                                                                         
         ''')
         colorama.deinit()
-
+    check_version()
     logo()
 
     print(''' 
@@ -236,52 +239,6 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)     
 
-
-    # Function that will check if the user's repos have already been downloaded and if they have KEEP THEM, if not download them. 
-    def check_repos(username, repo=None):
-        try:
-            r = requests.get(f"https://api.github.com/users/{username}/repos")
-            if r.status_code != 200:
-                print(f"Error: {str(r.status_code)}")
-                sys.exit(1)
-            repos = json.loads(r.text or r.content)
-            for repo in repos:
-                name = repo["name"]
-                clone_url = repo["clone_url"]
-                print(f"{name}: {clone_url}")
-                if os.path.exists(f"{name}"):
-                    print(f"{name} already exists!")
-                else:
-                    os.system(f"git clone {clone_url}")
-            next_page = r.links["next"]["url"]
-            while next_page is not None:
-                r = requests.get(next_page)
-                if r.status_code != 200:
-                    print(f"Error: {str(r.status_code)}")
-                    sys.exit(1)
-                repos = json.loads(r.text or r.content)
-                for repo in repos:
-                    name = repo["name"]
-                    clone_url = repo["clone_url"]
-                    print(f"{name}: {clone_url}")
-                    if os.path.exists(f"{name}"):
-                        print(f"{name} already exists!")
-                    else:
-                        os.system(f"git clone {clone_url}")
-                next_page = r.links["next"]["url"] if "next" in r.links else None 
-            print("Completed in !\nPress Enter To Exit...")
-            input("")
-            sys.exit(0)
-        except KeyboardInterrupt:
-            print("Exiting...")
-            input("Press enter to exit...")
-            sys.exit(0)
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            input("Press enter to exit...")
-            sys.exit(1)
-
-    def check_repos(username, repo):
         try:
             r = requests.get(f"https://api.github.com/users/{username}/repos")
             if r.status_code != 200:
@@ -398,13 +355,13 @@ def skidgithub():
         username = input('Enter the username: ')
         download_all(username)
 
-    if option == "2": # Download Specific Named Repo from a User
+    if option == "2": # Download Specific Named Repo from a User - download_specific(username, repo)
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
         repo = input('Enter the repo name: ')
         download_specific(username, repo)
 
-    if option == "3": # Download File Extension from a User and Repo
+    if option == "3": # Download File Extension from a User and Repo - search_file_ext(username, repo, extension)
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
         repo = input('Enter the repo name: ')
@@ -416,6 +373,31 @@ def skidgithub():
         username = input('Enter the username: ')
         extension = input('Enter the file extension: ')
 
+        def download_all(username, extension):
+            with open("settings/config.yml", "r") as ymlfile:
+                cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
+            r = requests.get(f"https://api.github.com/users/{username}/repos")
+            if r.status_code != 200:
+                print(f"Error: {str(r.status_code)}")
+                sys.exit(1)
+            repos = json.loads(r.text or r.content)
+            for repo in repos: 
+                name = repo["name"]
+                clone_url = repo["clone_url"]
+                os.system(f"git clone {clone_url} {name}")
+                for root, dirs, files in os.walk(name):
+                    for file in files:
+                        if file.endswith(extension):
+                            print(f"Found {file}")
+                            os.system(f"move .\\{name}\{file} {cfg['Settings']['save_to_path']}")
+                            # remove the directory
+                            print(f"Moved {file} to {cfg['Settings']['save_to_path']}!")
+                            os.system(f"rmdir /s /q {name}")
+                            print(f"Removed {name}!")
+
+    
+        download_all(username, extension)
+                    
     if option == "5": # Download/Find specific file name from a User and Repo
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
