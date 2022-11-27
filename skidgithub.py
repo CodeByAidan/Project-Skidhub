@@ -43,6 +43,7 @@ def skidgithub():
 
     option = input('Choose an option: ')
 
+    # download all repos
     def download_all(username):
         try:
             r = requests.get(f"https://api.github.com/users/{username}/repos")
@@ -86,6 +87,7 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)
 
+    # download a specific repo
     def download_specific(username, repo):
         try:
             r = requests.get(f"https://api.github.com/repos/{username}/{repo}")
@@ -109,7 +111,7 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)
 
-
+    # Function to search for a file name in all repos
     def search_all_files(username, file):
         try:
             r = requests.get(f"https://api.github.com/users/{username}/repos")
@@ -151,6 +153,7 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(0)
 
+    # Function to search for a file name in a specific repo
     def search_file(username, repo, file):
         try:
             r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents")
@@ -197,7 +200,7 @@ def skidgithub():
             sys.exit(1)     
 
 
-    # Create a function that will check if the user's repos have already been downloaded and if they have KEEP THEM, if not download them. 
+    # Function that will check if the user's repos have already been downloaded and if they have KEEP THEM, if not download them. 
     def check_repos(username):
         try:
             r = requests.get(f"https://api.github.com/users/{username}/repos")
