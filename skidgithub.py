@@ -35,8 +35,10 @@ def skidgithub():
     print(''' 
         [1] Download All
         [2] Download Specific Repo
-        [3] Search for a file name in
-        [3] Exit
+        [3] Search for a file name in all repos
+        [4] Search for a file name in a specific repo
+        [5] Search for a file extension in a specific repo
+        [6] Exit
     ''')
 
     option = input('Choose an option: ')
@@ -107,20 +109,177 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)
 
+
+    def search_all_files(username, file):
+        try:
+            r = requests.get(f"https://api.github.com/users/{username}/repos")
+            if r.status_code != 200:
+                print(f"Error: {str(r.status_code)}")
+                sys.exit(1)
+            repos = json.loads(r.text or r.content)
+            for repo in repos:
+                name = repo["name"]
+                clone_url = repo["clone_url"]
+                print(f"{name}: {clone_url}")
+                os.system(f"git clone {clone_url}")
+                for root, dirs, files in os.walk(f"{name}"):
+                    if file in files:
+                        print(f"Found {file} in {root}")
+                os.system(f"rmdir /S /Q {name}")
+            next_page = r.links["next"]["url"]
+            while next_page is not None:
+                r = requests.get(next_page)
+                if r.status_code != 200:
+                    print(f"Error: {str(r.status_code)}")
+                    sys.exit(1)
+                repos = json.loads(r.text or r.content)
+                for repo in repos:
+                    name = repo["name"]
+                    clone_url = repo["clone_url"]
+                    print(f"{name}: {clone_url}")
+                    os.system(f"git clone {clone_url}")
+                    for root, dirs, files in os.walk(f"{name}"):
+                        if file in files:
+                            print(f"Found {file} in {root}")
+                    os.system(f"rmdir /S /Q {name}")
+                next_page = r.links["next"]["url"] if "next" in r.links else None 
+            print("Completed in !\nPress Enter To Exit...")
+            input("")
+            sys.exit(0)
+        except KeyboardInterrupt:
+            print("Exiting...")
+            input("Press enter to exit...")
+            sys.exit(0)
+
+    def search_file(username, repo, file):
+        try:
+            r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents")
+            if r.status_code != 200:
+                print(f"Error: {str(r.status_code)}")
+                sys.exit(1)
+            repo = json.loads(r.text or r.content)
+            for file in repo:
+                if file["type"] == "file":
+                    print(file["name"])
+            print("Completed in !\nPress Enter To Exit...")
+            input("")
+            sys.exit(0)
+        except KeyboardInterrupt:
+            print("Exiting...")
+            input("Press enter to exit...")
+            sys.exit(0)
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            input("Press enter to exit...")
+            sys.exit(1)
+
+    # Search for a file extension in a specific repo
+    def search_file_ext(username, repo, extension):
+        try:
+            r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents")
+            if r.status_code != 200:
+                print(f"Error: {str(r.status_code)}")
+                sys.exit(1)
+            repo = json.loads(r.text or r.content)
+            for file in repo:
+                if file["type"] == "file" and file["name"].endswith(extension):
+                    print(file["name"])
+            print("Completed in !\nPress Enter To Exit...")
+            input("")
+            sys.exit(0)
+        except KeyboardInterrupt:
+            print("Exiting...")
+            input("Press enter to exit...")
+            sys.exit(0)
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            input("Press enter to exit...")
+            sys.exit(1)     
+
+
+    # Create a function that will check if the user's repos have already been downloaded and if they have KEEP THEM, if not download them. 
+    def check_repos(username):
+        try:
+            r = requests.get(f"https://api.github.com/users/{username}/repos")
+            if r.status_code != 200:
+                print(f"Error: {str(r.status_code)}")
+                sys.exit(1)
+            repos = json.loads(r.text or r.content)
+            for repo in repos:
+                name = repo["name"]
+                clone_url = repo["clone_url"]
+                print(f"{name}: {clone_url}")
+                if os.path.isdir(f"{name}"):
+                    print(f"Skipping {name}...")
+                else:
+                    os.system(f"git clone {clone_url}")
+            next_page = r.links["next"]["url"] if "next" in r.links else None
+            while next_page is not None:
+                r = requests.get(next_page)
+                if r.status_code != 200:
+                    print(f"Error: {str(r.status_code)}")
+                    sys.exit(1)
+                repos = json.loads(r.text or r.content)
+                for repo in repos:
+                    name = repo["name"]
+                    clone_url = repo["clone_url"]
+                    print(f"{name}: {clone_url}")
+                    if os.path.isdir(f"{name}"):
+                        print(f"Skipping {name}...")
+                    else:
+                        os.system(f"git clone {clone_url}")
+        except KeyboardInterrupt:
+            print("Exiting...")
+            input("Press enter to exit...")
+            sys.exit(0)
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            input("Press enter to exit...")
+            sys.exit(1)
+
     if option == '1': # Download All Repos
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
+        check_repos(username)
         download_all(username)
 
     if option == "2": # Download Specific Repo
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
         repo = input('Enter the repo name: ')
+        check_repos(username)
         download_specific(username, repo)
 
-    if option == '3': # Exit
+    #TODO: Fix this by adding a check to see if the repo has already been downloaded
+    if option == "3": # Search for a file name in all repos
+        os.system('cls' if os.name == 'nt' else 'clear')    
+        username = input("Enter the username: ")
+        file = input("Enter the file name: ")
+        check_repos(username)
+        search_all_files(username, file)
+
+    #TODO: Fix this by adding a check to see if the repo has already been downloaded
+    if option == "4": # Search for a file name in a specific repo
+        os.system('cls' if os.name == 'nt' else 'clear')
+        username = input("Enter the username: ")
+        repo = input("Enter the repo name: ")
+        file = input("Enter the file name: ")
+        check_repos(username)
+        search_file(username, repo, file)
+
+    #TODO: Fix this by adding a check to see if the repo has already been downloaded
+    if option == "5": # Search for a file extension in a specific repo
+        os.system('cls' if os.name == 'nt' else 'clear')
+        username = input("Enter the username: ")
+        repo = input("Enter the repo name: ")
+        extension = input("Enter the file extension: ")
+        check_repos(username)
+        search_file_ext(username, repo, extension)
+
+    if option == '6': # Exit
         sys.exit()
 
 
         
-skidgithub()
+if __name__ == "__main__":
+   skidgithub()
