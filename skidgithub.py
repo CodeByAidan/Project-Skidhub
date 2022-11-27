@@ -10,47 +10,56 @@ import requests
 import yaml
 import textwrap
 
-version = "1.0"
 
-#TODO: add a help menu
-#TODO: add a credits menu
-#TODO: add a update menu (check for updates)
-#TODO: add a search menu (search for users, repos, files, etc)
-#TODO: add a "download" menu
-
-def check_version():
-    global version
-    latest_version = requests.get("https://api.github.com/repos/livxy/Project-Skidhub/releases/latest").json()["tag_name"]
-    latest_version_link = requests.get("https://api.github.com/repos/livxy/Project-Skidhub/releases/latest").json()["html_url"]
-    if latest_version != version:
-        print(f"{colorama.Fore.RED}You are not running the latest version of Project-Skidhub!{colorama.Fore.RESET}")
-        print(f"{colorama.Fore.RED}Please update to the latest version!{colorama.Fore.RESET}")
-        print(f"{colorama.Fore.RED}v{latest_version} -> {latest_version_link}{colorama.Fore.RESET}")
-        sys.exit()
-
-if not os.path.isdir("settings/"): os.makedirs("settings/");
-if not os.path.isfile("settings/config.yml"):
-    with open("settings/config.yml", "a+") as file:
-        file.write(f'''
-Settings:
-    debug: false
-    proxy: false
-    save_to_path: {os.getcwd()}
-    threads: 1
-    timeout: 10
-    user_agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.2) Gecko/20100101 Firefox/10.0.2
-    verbose: false                               
-                ''')
-
-config = yaml.safe_load(open("settings/config.yml"))
-if config['Settings']["debug"] == True:
-    logging.basicConfig(level=logging.DEBUG)
-
-if config['Settings']["verbose"] == True:
-    verboselogs.install()
-    logging.basicConfig(level=verboselogs.VERBOSE)
 
 def skidgithub():
+    
+    version = "1.0"
+
+    #TODO: add a help menu
+    #TODO: add a credits menu
+    #TODO: add a update menu (check for updates)
+    #TODO: add a search menu (search for users, repos, files, etc)
+    #TODO: add a "download" menu
+
+    def check_version():
+        global version
+        try:
+            latest_version = requests.get("https://api.github.com/repos/livxy/Project-Skidhub/releases/latest").json()["tag_name"]
+            latest_version_link = requests.get("https://api.github.com/repos/livxy/Project-Skidhub/releases/latest").json()["html_url"]
+            if latest_version != version:
+                print(f"{colorama.Fore.RED}You are not running the latest version of Project-Skidhub!{colorama.Fore.RESET}")
+                print(f"{colorama.Fore.RED}Please update to the latest version!{colorama.Fore.RESET}")
+                print(f"{colorama.Fore.RED}v{latest_version} -> {latest_version_link}{colorama.Fore.RESET}")
+                sys.exit()
+        except Exception as e:
+            print(f"{colorama.Fore.RED}Failed to check for updates!{colorama.Fore.RESET}")
+            print(f"{colorama.Fore.RED}Error: {e}{colorama.Fore.RESET}")
+
+    if not os.path.isdir("settings/"): os.makedirs("settings/");
+    if not os.path.isfile("settings/config.yml"):
+        with open("settings/config.yml", "a+") as file:
+            file.write(f'''
+    Settings:
+        debug: false
+        proxy: false
+        save_to_path: {os.getcwd()}
+        threads: 1
+        timeout: 10
+        user_agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.2) Gecko/20100101 Firefox/10.0.2
+        verbose: false                               
+                    ''')
+
+    config = yaml.safe_load(open("settings/config.yml"))
+    if config['Settings']["debug"] == True:
+        logging.basicConfig(level=logging.DEBUG)
+
+    if config['Settings']["verbose"] == True:
+        verboselogs.install()
+        logging.basicConfig(level=verboselogs.VERBOSE)
+    
+    
+    
     # clear the screen and make a blue title
     def logo():
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -65,8 +74,16 @@ def skidgithub():
         ''')
         colorama.deinit()
     check_version()
-    logo()
-
+    print(colorama.Fore.LIGHTGREEN_EX + '''
+        .oooooo..o oooo         o8o        .o8  oooo                     .o8       
+        d8P'    `Y8 `888         `"'       "888  `888                    "888       
+        Y88bo.       888  oooo  oooo   .oooo888   888 .oo.   oooo  oooo   888oooo.  
+        `"Y8888o.   888 .8P'   `888  d88' `888   888P"Y88b  `888  `888   d88' `88b 
+            `"Y88b  888888.     888  888   888   888   888   888   888   888   888 
+        oo     .d8P  888 `88b.   888  888   888   888   888   888   888   888   888 
+        8""88888P'  o888o o888o o888o `Y8bod88P" o888o o888o  `V88V"V8P'  `Y8bod8P'                                                                                                                                                         
+    ''')
+    colorama.deinit()
     print(''' 
         [1] Download All Repos from a User
         [2] Download Specific Named Repo from a User
