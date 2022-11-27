@@ -37,11 +37,11 @@ It is a simple python application that "skids" or simply, downloads off other Gi
 2. Run the python script:
   Type in your terminal/command-prompt:
   ```console
-  python3 main.py
+  python3 skidgithub.py
   ```
   or 
   ```console
-  python main.py
+  python skidgithub.py
   ```
 
 3. Follow the instructions on the menu page on the terminal/command-prompt from there! :)
