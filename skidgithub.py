@@ -35,7 +35,19 @@ def skidgithub():
         except Exception as e:
             print(f"{colorama.Fore.RED}Failed to check for updates!{colorama.Fore.RESET}")
             print(f"{colorama.Fore.RED}Error: {e}{colorama.Fore.RESET}")
-
+            # check if it's because of the rate limit
+            if requests.get("https://api.github.com/rate_limit").json()["resources"]["core"]["remaining"] == 0:
+                print(f"{colorama.Fore.RED}You have reached the GitHub API rate limit!{colorama.Fore.RESET}")
+                print(f"{colorama.Fore.RED}You can check your rate limit here: https://api.github.com/rate_limit{colorama.Fore.RESET}")
+                # convert line above to minutes
+                print(f"{colorama.Fore.RED}Try again in: {round((requests.get('https://api.github.com/rate_limit').json()['resources']['core']['reset'] - time.time()) / 60)} minutes{colorama.Fore.RESET}")
+                input("Press enter to exit...")
+                sys.exit()
+            else:
+                print(f"{colorama.Fore.RED}Please try again later!{colorama.Fore.RESET}")
+                input("Press enter to exit...")
+                sys.exit()
+                
     if not os.path.isdir("settings/"): os.makedirs("settings/");
     if not os.path.isfile("settings/config.yml"):
         with open("settings/config.yml", "a+") as file:
