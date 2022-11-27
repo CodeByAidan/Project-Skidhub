@@ -1,0 +1,8 @@
+Settings:
+  debug: false
+  proxy: false
+  save_to_path: C:\Users\aidan\OneDrive\Documents\GitHub\Project-Skidhub
+  threads: 1
+  timeout: 10
+  user_agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.2) Gecko/20100101 Firefox/10.0.2
+  verbose: true
