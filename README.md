@@ -1,26 +1,23 @@
 # Project-Skidhub
 Want to be a absolute degen? Well I have the application just for you! Introducing **_Project Skidhub_**!
 
-![real timof](https://media.tenor.com/7xNjhqN_dMgAAAAC/i-am-losing-my-grip-on-reality-i-have-gone-clinically-insane.gif)
-
-<br><br>
+![real timof](https://github.com/livxy/Project-Skidhub/blob/main/real.gif)
 
 ## What is it?
-It is a simple python application that skids (downloads) off other GitHub accounts! (SEE FEATURES BELOW FOR MORE CONTEXT)
+It is a simple python application that "skids" or simply, downloads off other GitHub accounts! **(SEE FEATURES BELOW FOR MORE CONTEXT)**
 
 
 
 ## Current Features:
-[X] *Download All Repos
-
-[X] *Download Specific Named Repos 
-
-<form>
-<input type="checkbox" name="vehicle3" value="Boat" checked>
-<label for="vehicle3"> I have a boat</label><br><br>
-</form>
+- [x] *Download All Repos
+- [x] **Download Specific Named Repos
+- [ ] **Download by File Extension
+- [ ] **Repost
+- [ ] Proxy Support
+- [ ] Settings
 
 ###### * given username
+###### ** given username and repo name
 
 
 ## Why did you make this?!!
