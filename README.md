@@ -13,6 +13,7 @@ It is a simple python application that "skids" or simply, downloads off other Gi
 - [x] **Download Specific Named Repos
 - [ ] **Download by File Extension 
 - [ ] *Download by File Extension
+- [ ] *Download specific file name
 - [ ] **Repost
 - [ ] Proxy Support
 - [ ] Settings
