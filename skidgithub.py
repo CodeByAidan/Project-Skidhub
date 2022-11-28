@@ -13,15 +13,16 @@ import textwrap
 
 
 def skidgithub():
-    
-    version = "1.0"
+    global version
 
     #TODO: add a help menu
     #TODO: add a credits menu
     #TODO: add a update menu (check for updates)
     #TODO: add a search menu (search for users, repos, files, etc)
     #TODO: add a "download" menu
-
+    #TODO: MOVE FUNCTIONS OUT OF THE OPTIONS MENU (╯°□°）╯︵ ┻━┻
+    #TODO: check OS and use the correct path separator
+ 
     def check_version():
         global version
         try:
@@ -56,6 +57,7 @@ def skidgithub():
         debug: false
         proxy: false
         save_to_path: {os.getcwd()}
+        save_to_path_automatic: true # If true, the save_to_path will be automatically set to the current directory, even if the save_to_path is set manually.
         threads: 1
         timeout: 10
         user_agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.2) Gecko/20100101 Firefox/10.0.2
@@ -70,7 +72,10 @@ def skidgithub():
         verboselogs.install()
         logging.basicConfig(level=verboselogs.VERBOSE)
     
-    
+    if config['Settings']["save_to_path_automatic"] == True:
+        config["Settings"]["save_to_path"] = os.getcwd()
+        with open("settings/config.yml", "w") as file:
+            yaml.dump(config, file, default_flow_style=False)
     
     # clear the screen and make a blue title
     def logo():
@@ -110,7 +115,7 @@ def skidgithub():
     option = input('Choose an option: ')
 
     # download all repos
-    def download_all(username):
+    def download_all(username): # (Option 1) - Download All Repos from a User
         try:
             r = requests.get(f"https://api.github.com/users/{username}/repos")
             if r.status_code != 200:
@@ -244,7 +249,6 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)
 
-    #! this should work? 
     # Search for a file extension in a specific repo
     def search_file_ext(username, repo, extension):
         try:
@@ -268,46 +272,89 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)     
 
-        try:
+    def download_all(username, extension): # (Option 4) Download File Extension from a User (All Repos)
+        with open("settings/config.yml", "r") as ymlfile:
+            cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
+        r = requests.get(f"https://api.github.com/users/{username}/repos")
+        if r.status_code != 200:
+            print(f"Error: {str(r.status_code)} - {str(r.text)}")
+            sys.exit(1)
+        repos = json.loads(r.text or r.content)
+        for repo in repos: 
+            name = repo["name"]
+            clone_url = repo["clone_url"]
+            os.system(f"git clone {clone_url} {name}")
+            found_name = []
+            foundpath = []
+            found_repo = []
+
+            for root, dirs, files in os.walk(name):
+                for file in files:
+                    if file.endswith(extension):
+                        found_name.append(file)
+                        found_repo.append(name)
+                        print(f"Found {file}")
+                        if os.name == 'nt':
+                            os.system(f"move .\\{name}\{file} {cfg['Settings']['save_to_path']}")
+                        else:
+                            os.system(f"mv ./{name}/{file} {cfg['Settings']['save_to_path']}")
+                        # remove the directory
+                        print(f"Moved {file} to {cfg['Settings']['save_to_path']}!")
+                        foundpath.append(os.path.join(root, file))
+                        if os.name == 'nt':
+                            os.system(f"rmdir /s /q {name}")
+                        else:
+                            os.system(f"rm -rf {name}")
+                        print(f"Removed {name}!")
+            print(f"Found {len(found_name)} files with the extension {extension} in {len(found_repo)} repos!")
+            print(f"Moved {len(found_name)} files to {cfg['Settings']['save_to_path']}!")
+            print(f"Removed {len(found_repo)} repos!")
+            print(f"Done!")
+
+    def search_file_name_all(username, file_name): # (Option 6) - Download/Find specific file name from a User (All Repos)
+            with open("settings/config.yml", "r") as ymlfile:
+                cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
             r = requests.get(f"https://api.github.com/users/{username}/repos")
             if r.status_code != 200:
-                print(f"Error: {str(r.status_code)}")
-                input("Press enter to exit...")
+                print(f"Error: {str(r.status_code)} - {str(r.text)}")
                 sys.exit(1)
             repos = json.loads(r.text or r.content)
             for repo in repos:
                 name = repo["name"]
                 clone_url = repo["clone_url"]
-                print(f"{name}: {clone_url}")
-                if os.path.isdir(f"{name}"):
-                    print(f"Skipping {name}...")
-                else:
-                    os.system(f"git clone {clone_url}")
-            next_page = r.links["next"]["url"] if "next" in r.links else None
-            while next_page is not None:
-                r = requests.get(next_page)
-                if r.status_code != 200:
-                    print(f"Error: {str(r.status_code)}")
-                    sys.exit(1)
-                repos = json.loads(r.text or r.content)
-                for repo in repos:
-                    name = repo["name"]
-                    clone_url = repo["clone_url"]
-                    print(f"{name}: {clone_url}")
-                    if os.path.isdir(f"{name}"):
-                        print(f"Skipping {name}...")
-                    else:
-                        os.system(f"git clone {clone_url}")
-        except KeyboardInterrupt:
-            print("Exiting...")
-            input("Press enter to exit...")
-            sys.exit(0)
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            input("Press enter to exit...")
+                os.system(f"git clone {clone_url} {name}")
+                found_name = []
+                foundpath = []
+                found_repo = []
+                for root, dirs, files in os.walk(name):
+                    for file in files:
+                        if file == file_name:
+                            found_name.append(file)
+                            found_repo.append(name)
+                            print(f"Found {file}!")
+                            if os.name == 'nt':
+                                os.system(f"move .\\{name}\{file} {cfg['Settings']['save_to_path']}")
+                            else:
+                                os.system(f"mv ./{name}/{file} {cfg['Settings']['save_to_path']}")
+                            # remove the directory
+                            if os.name == 'nt':
+                                os.system(f"rmdir /s /q {name}")
+                            else:
+                                os.system(f"rm -rf {name}")
+                            print(f"Moved {file} to {cfg['Settings']['save_to_path']}!")
+                            print(f"Removed {name}!")
+                            foundpath.append(os.path.join(root, file))
+                print(f"Found {len(found_name)} files with the name {file_name} in {len(found_repo)} repos!")
+                print(f"Moved {len(found_name)} files to {cfg['Settings']['save_to_path']}!")
+                print(f"Removed {len(found_repo)} repos!")
+                print(f"Done!")
+                input("")
+                sys.exit(0)
+            print(f"Could not find {file_name}!")
+            input("")
             sys.exit(1)
 
-    def scrape_proxies(type): #proxies [http, https, socks4, socks5, all]
+    def scrape_proxies(type): # (Settings) - proxies [http, https, socks4, socks5, all]
         if type == "http":
             if not os.path.isdir("settings/proxies/"): os.makedirs("settings/proxies/");
             with open("settings/proxies/http.txt", "a+") as file:
@@ -401,29 +448,6 @@ def skidgithub():
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
         extension = input('Enter the file extension: ')
-
-        def download_all(username, extension):
-            with open("settings/config.yml", "r") as ymlfile:
-                cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
-            r = requests.get(f"https://api.github.com/users/{username}/repos")
-            if r.status_code != 200:
-                print(f"Error: {str(r.status_code)}")
-                sys.exit(1)
-            repos = json.loads(r.text or r.content)
-            for repo in repos: 
-                name = repo["name"]
-                clone_url = repo["clone_url"]
-                os.system(f"git clone {clone_url} {name}")
-                for root, dirs, files in os.walk(name):
-                    for file in files:
-                        if file.endswith(extension):
-                            print(f"Found {file}")
-                            os.system(f"move .\\{name}\{file} {cfg['Settings']['save_to_path']}")
-                            # remove the directory
-                            print(f"Moved {file} to {cfg['Settings']['save_to_path']}!")
-                            os.system(f"rmdir /s /q {name}")
-                            print(f"Removed {name}!")
-
     
         download_all(username, extension)
                     
@@ -431,13 +455,42 @@ def skidgithub():
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
         repo = input('Enter the repo name: ')
-        file_name = input('Enter the file name: ')
+        file_name = input('Enter the file name (including extension i.e. "index.html"): ')
+
+        def search_file_name(username, repo, file_name):
+            with open("settings/config.yml", "r") as ymlfile:
+                cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
+            r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/")
+            if r.status_code != 200:
+                print(f"Error: {str(r.status_code)} - {str(r.text)}")
+                sys.exit(1)
+            files = json.loads(r.text or r.content)
+            for file in files:
+                name = file["name"]
+                if name == file_name:
+                    print(f"Found {file_name}!")
+                    download_url = file["download_url"]
+                    if os.name == 'nt':
+                        os.system(f"curl -o {cfg['Settings']['save_to_path']}\{file_name} {download_url}")
+                    else:
+                        os.system(f"curl -o {cfg['Settings']['save_to_path']}/{file_name} {download_url}")
+                    print(f"Downloaded {file_name} to {cfg['Settings']['save_to_path']}!")
+                    print(f"Moved {file_name} to {cfg['Settings']['save_to_path']}!")
+                    print(f"Done!")
+                    input("")
+                    sys.exit(0)
+            print(f"Could not find {file_name}!")
+            input("")
+            sys.exit(1)
+            
+        search_file_name(username, repo, file_name)
 
     if option == "6": #Download/Find specific file name from a User (All Repos)
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
-        file_name = input('Enter the file name: ')
+        file_name = input('Enter the file name (including extension i.e. "index.html"): ')
 
+        search_file_name_all(username, file_name)
 
     if option == "7": # Settings
         def settings():
@@ -715,6 +768,11 @@ def skidgithub():
 
         settings()
 
+    if option == "8": # Repost :troll:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        logo()
+        print("")
+
     if option == "8": #Exit
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Exiting...")
@@ -722,4 +780,5 @@ def skidgithub():
         sys.exit(0)
         
 if __name__ == "__main__":
+   version = "1.0"
    skidgithub()

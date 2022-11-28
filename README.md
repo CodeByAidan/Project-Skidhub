@@ -11,13 +11,13 @@ It is a simple python application that "skids" or simply, downloads off other Gi
 ## Current Features:
 - [x] *Download All Repos
 - [x] **Download Specific Named Repos
-- [x] Proxy Support & Proxy Scraper
-- [x] User-Agent Support
-- [x] Threading Support
+- [x] *Download specific file name
+- [x] **Download by File Extension 
+- [x] *Download by File Extension
+- [ ] Proxy Support & Proxy Scraper
+- [ ] User-Agent Support
+- [ ] Threading Support
 - [x] Settings
-- [ ] **Download by File Extension 
-- [ ] *Download by File Extension
-- [ ] *Download specific file name
 - [ ] **Repost
 
 ###### * given username
