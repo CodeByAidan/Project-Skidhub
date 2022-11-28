@@ -90,7 +90,9 @@ def skidgithub():
             8""88888P'  o888o o888o o888o `Y8bod88P" o888o o888o  `V88V"V8P'  `Y8bod8P'                                                                                                                                                         
         ''')
         colorama.deinit()
+    
     check_version()
+   
     print(colorama.Fore.LIGHTGREEN_EX + '''
         .oooooo..o oooo         o8o        .o8  oooo                     .o8       
         d8P'    `Y8 `888         `"'       "888  `888                    "888       
@@ -100,7 +102,9 @@ def skidgithub():
         oo     .d8P  888 `88b.   888  888   888   888   888   888   888   888   888 
         8""88888P'  o888o o888o o888o `Y8bod88P" o888o o888o  `V88V"V8P'  `Y8bod8P'                                                                                                                                                         
     ''')
+    
     colorama.deinit()
+    
     print(''' 
         [1] Download All Repos from a User
         [2] Download Specific Named Repo from a User
@@ -114,8 +118,7 @@ def skidgithub():
 
     option = input('Choose an option: ')
 
-    # download all repos
-    def download_all(username): # (Option 1) - Download All Repos from a User
+    def download_all_repos(username): #               (Option 1) - Download All Repos from a User
         try:
             r = requests.get(f"https://api.github.com/users/{username}/repos")
             if r.status_code != 200:
@@ -158,8 +161,7 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)
 
-    # download a specific repo
-    def download_specific(username, repo):
+    def download_specific(username, repo): #          (Option 2) - Download Specific Named Repo from a User
         try:
             r = requests.get(f"https://api.github.com/repos/{username}/{repo}")
             if r.status_code != 200:
@@ -182,75 +184,7 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(1)
 
-    # Function to search for a file name in all repos
-    def search_all_files(username, file):
-        try:
-            r = requests.get(f"https://api.github.com/users/{username}/repos")
-            if r.status_code != 200:
-                print(f"Error: {str(r.status_code)}")
-                sys.exit(1)
-            repos = json.loads(r.text or r.content)
-            for repo in repos:
-                name = repo["name"]
-                clone_url = repo["clone_url"]
-                print(f"{name}: {clone_url}")    
-                os.system(f"git clone {clone_url}")
-                for root, dirs, files in os.walk(f"{name}"):
-                    if file in files:
-                        print(f"{file} found in {name}")
-                        print(f"Path: {root}")
-                        print("")            
-                os.system(f"rmdir /S /Q {name}")
-            next_page = r.links["next"]["url"]
-            while next_page is not None:
-                r = requests.get(next_page)
-                if r.status_code != 200:
-                    print(f"Error: {str(r.status_code)}")
-                    sys.exit(1)
-                repos = json.loads(r.text or r.content)
-                for repo in repos:
-                    name = repo["name"]
-                    clone_url = repo["clone_url"]
-                    print(f"{name}: {clone_url}")
-                    os.system(f"git clone {clone_url}")
-                    for root, dirs, files in os.walk(f"{name}"):
-                        if file in files:
-                            print(f"Found {file} in {root}")
-                    os.system(f"rmdir /S /Q {name}")
-                next_page = r.links["next"]["url"] if "next" in r.links else None 
-            print("Completed in !\nPress Enter To Exit...")
-            input("")
-            sys.exit(0)
-        except KeyboardInterrupt:
-            print("Exiting...")
-            input("Press enter to exit...")
-            sys.exit(0)
-
-    # Function to search for a file name in a specific repo
-    def search_file(username, repo, file):
-        try:
-            r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents")
-            if r.status_code != 200:
-                print(f"Error: {str(r.status_code)}")
-                sys.exit(1)
-            repo = json.loads(r.text or r.content)
-            for file in repo:
-                if file["type"] == "file":
-                    print(file["name"])
-            print("Completed in !\nPress Enter To Exit...")
-            input("")
-            sys.exit(0)
-        except KeyboardInterrupt:
-            print("Exiting...")
-            input("Press enter to exit...")
-            sys.exit(0)
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            input("Press enter to exit...")
-            sys.exit(1)
-
-    # Search for a file extension in a specific repo
-    def search_file_ext(username, repo, extension):
+    def search_file_ext(username, repo, extension): # (Option 3) - Download File Extension from a User and Repo
         try:
             r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents")
             if r.status_code != 200:
@@ -270,9 +204,9 @@ def skidgithub():
         except Exception as e:
             print(f"Error: {str(e)}")
             input("Press enter to exit...")
-            sys.exit(1)     
+            sys.exit(1)   
 
-    def download_all(username, extension): # (Option 4) Download File Extension from a User (All Repos)
+    def download_all(username, extension): #          (Option 4) Download File Extension from a User (All Repos)
         with open("settings/config.yml", "r") as ymlfile:
             cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
         r = requests.get(f"https://api.github.com/users/{username}/repos")
@@ -311,50 +245,76 @@ def skidgithub():
             print(f"Removed {len(found_repo)} repos!")
             print(f"Done!")
 
-    def search_file_name_all(username, file_name): # (Option 6) - Download/Find specific file name from a User (All Repos)
-            with open("settings/config.yml", "r") as ymlfile:
-                cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
-            r = requests.get(f"https://api.github.com/users/{username}/repos")
-            if r.status_code != 200:
-                print(f"Error: {str(r.status_code)} - {str(r.text)}")
-                sys.exit(1)
-            repos = json.loads(r.text or r.content)
-            for repo in repos:
-                name = repo["name"]
-                clone_url = repo["clone_url"]
-                os.system(f"git clone {clone_url} {name}")
-                found_name = []
-                foundpath = []
-                found_repo = []
-                for root, dirs, files in os.walk(name):
-                    for file in files:
-                        if file == file_name:
-                            found_name.append(file)
-                            found_repo.append(name)
-                            print(f"Found {file}!")
-                            if os.name == 'nt':
-                                os.system(f"move .\\{name}\{file} {cfg['Settings']['save_to_path']}")
-                            else:
-                                os.system(f"mv ./{name}/{file} {cfg['Settings']['save_to_path']}")
-                            # remove the directory
-                            if os.name == 'nt':
-                                os.system(f"rmdir /s /q {name}")
-                            else:
-                                os.system(f"rm -rf {name}")
-                            print(f"Moved {file} to {cfg['Settings']['save_to_path']}!")
-                            print(f"Removed {name}!")
-                            foundpath.append(os.path.join(root, file))
-                print(f"Found {len(found_name)} files with the name {file_name} in {len(found_repo)} repos!")
-                print(f"Moved {len(found_name)} files to {cfg['Settings']['save_to_path']}!")
-                print(f"Removed {len(found_repo)} repos!")
+    def search_file_name(username, repo, file_name): #(Option 5) - Download/Find specific file name from a User and Repo
+        with open("settings/config.yml", "r") as ymlfile:
+            cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
+        r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/")
+        if r.status_code != 200:
+            print(f"Error: {str(r.status_code)} - {str(r.text)}")
+            sys.exit(1)
+        files = json.loads(r.text or r.content)
+        for file in files:
+            name = file["name"]
+            if name == file_name:
+                print(f"Found {file_name}!")
+                download_url = file["download_url"]
+                if os.name == 'nt':
+                    os.system(f"curl -o {cfg['Settings']['save_to_path']}\{file_name} {download_url}")
+                else:
+                    os.system(f"curl -o {cfg['Settings']['save_to_path']}/{file_name} {download_url}")
+                print(f"Downloaded {file_name} to {cfg['Settings']['save_to_path']}!")
+                print(f"Moved {file_name} to {cfg['Settings']['save_to_path']}!")
                 print(f"Done!")
                 input("")
                 sys.exit(0)
-            print(f"Could not find {file_name}!")
-            input("")
+        print(f"Could not find {file_name}!")
+        input("")
+        sys.exit(1)
+    
+    def search_file_name_all(username, file_name): #  (Option 6) - Download/Find specific file name from a User (All Repos)
+        with open("settings/config.yml", "r") as ymlfile:
+            cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
+        r = requests.get(f"https://api.github.com/users/{username}/repos")
+        if r.status_code != 200:
+            print(f"Error: {str(r.status_code)} - {str(r.text)}")
             sys.exit(1)
+        repos = json.loads(r.text or r.content)
+        for repo in repos:
+            name = repo["name"]
+            clone_url = repo["clone_url"]
+            os.system(f"git clone {clone_url} {name}")
+            found_name = []
+            foundpath = []
+            found_repo = []
+            for root, dirs, files in os.walk(name):
+                for file in files:
+                    if file == file_name:
+                        found_name.append(file)
+                        found_repo.append(name)
+                        print(f"Found {file}!")
+                        if os.name == 'nt':
+                            os.system(f"move .\\{name}\{file} {cfg['Settings']['save_to_path']}")
+                        else:
+                            os.system(f"mv ./{name}/{file} {cfg['Settings']['save_to_path']}")
+                        # remove the directory
+                        if os.name == 'nt':
+                            os.system(f"rmdir /s /q {name}")
+                        else:
+                            os.system(f"rm -rf {name}")
+                        print(f"Moved {file} to {cfg['Settings']['save_to_path']}!")
+                        print(f"Removed {name}!")
+                        foundpath.append(os.path.join(root, file))
+            print(f"Found {len(found_name)} files with the name {file_name} in {len(found_repo)} repos!")
+            print(f"Moved {len(found_name)} files to {cfg['Settings']['save_to_path']}!")
+            print(f"Removed {len(found_repo)} repos!")
+            print(f"Done!")
+            input("")
+            sys.exit(0)
+        print(f"Could not find {file_name}!")
+        input("")
+        sys.exit(1)
 
-    def scrape_proxies(type): # (Settings) - proxies [http, https, socks4, socks5, all]
+    def scrape_proxies(type): #                       (In Option 7 - Settings) - proxies [http, https, socks4, socks5, all]
         if type == "http":
             if not os.path.isdir("settings/proxies/"): os.makedirs("settings/proxies/");
             with open("settings/proxies/http.txt", "a+") as file:
@@ -426,10 +386,283 @@ def skidgithub():
             input("Press enter to exit...")
             sys.exit(0)
 
+    def settings(): #                                 (Option 7) - Settings
+        os.system('cls' if os.name == 'nt' else 'clear')
+        logo()
+
+        with open("settings/config.yml", "r") as ymlfile:
+            cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)          
+            
+        print(textwrap.fill("Settings", width=50, initial_indent=' ' * 25, subsequent_indent=' ' * 25))
+        print(opts := (f'''
+            1. Proxy = {cfg['Settings']['proxy']}
+            2. User-Agent = {cfg['Settings']['user_agent']}
+            3. Threads = {cfg['Settings']['threads']}
+            4. Timeout = {cfg['Settings']['timeout']}
+            5. Verbose = {cfg['Settings']['verbose']}
+            6. Save to path = {cfg['Settings']['save_to_path']}
+            7. Debug = {cfg['Settings']['debug']}
+            8. Back
+        '''))
+
+        option = input("Enter the option: ")
+
+        if option == "1": # Proxy
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            print(f"Current Proxy: {cfg['Settings']['proxy']}\n\n1. Use Proxy (http, https, socks4, socks5, all), \n2. Don't Use Proxy\n3. Back")
+            option = input("Enter the option: ")
+            if option == "1":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                proxy = input("Enter the proxy (http, https, socks4, socks5, all): ")
+                if proxy == "http":
+                    scrape_proxies("http")
+                if proxy == "https":
+                    scrape_proxies("https")
+                if proxy == "socks4":
+                    scrape_proxies("socks4")
+                if proxy == "socks5":
+                    scrape_proxies("socks5")
+                if proxy == "all":
+                    scrape_proxies("all")
+                else:
+                    print("Invalid proxy type. Please create an issue on github if you think this is a bug.")
+                    input("Going back to settings...")
+                    settings()
+                cfg['Settings']['proxy'] = proxy
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Proxy set to {proxy}")
+                time.sleep(0.5)
+                settings()
+            if option == "2":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                cfg['Settings']['proxy'] = ""
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print("Proxy set to None")
+                time.sleep(0.5)
+                settings()
+            if option == "3":
+                settings()
+            else:
+                print("Invalid option")
+                time.sleep(0.5)
+                settings()
+
+        if option == "2": # User-Agent
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+
+        if option == "3": # Threads
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            print(f"Current Threads: {cfg['Settings']['threads']}\n\n1. Use Threads\n2. Don't Use Threads\n3. Edit Threads\n4. Go Back")
+            option = input("Enter the option: ")
+            if option == "1":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                threads = input("Enter the threads: ")
+                cfg['Settings']['threads'] = threads
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Threads set to {threads}")
+                time.sleep(0.5)
+                settings()
+            if option == "2":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                cfg['Settings']['threads'] = ""
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print("Threads set to None")
+                time.sleep(0.5)
+                settings()
+            if option == "3":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                threads = input("Enter the threads: ")
+                cfg['Settings']['threads'] = threads
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Threads set to {threads}")
+                time.sleep(0.5)
+                settings()
+            if option == "4":
+                settings()
+            else:
+                print("Invalid option")
+                time.sleep(0.5)
+                settings()
+
+        if option == "4": # Timeout
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            print(f"Current Timeout: {cfg['Settings']['timeout']}\n\n1. Use Timeout\n2. Don't Use Timeout\n3. Edit Timeout\n4. Go Back")
+            option = input("Enter the option: ")
+            if option == "1":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                timeout = input("Enter the timeout: ")
+                cfg['Settings']['timeout'] = timeout
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Timeout set to {timeout}")
+                time.sleep(0.5)
+                settings()
+            if option == "2":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                cfg['Settings']['timeout'] = ""
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print("Timeout set to None")
+                time.sleep(0.5)
+                settings()
+            if option == "3":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                timeout = input("Enter the timeout: ")
+                cfg['Settings']['timeout'] = timeout
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Timeout set to {timeout}")
+                time.sleep(0.5)
+                settings()
+            if option == "4":
+                settings()
+            else:
+                print("Invalid option")
+                time.sleep(0.5)
+                settings()
+
+        if option == "5": # Verbose
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            print(f"Current Verbose: {cfg['Settings']['verbose']}\n\n1. Use Verbose\n2. Don't Use Verbose\n3. Edit Verbose\n4. Go Back")
+            option = input("Enter the option: ")
+            if option == "1":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                verbose = "True"
+                cfg['Settings']['verbose'] = True 
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                verboselogs
+                print(f"Verbose set to {verbose}")
+                verboselogs.install()
+                logging.basicConfig(level=verboselogs.VERBOSE)
+                time.sleep(0.5)
+                settings()
+            if option == "2":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                
+                cfg['Settings']['verbose'] = "False"
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print("Verbose set to False")
+                time.sleep(0.5)
+                settings()
+            if option == "3":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                verbose = input("Enter True/False: ")
+                if verbose != "True" or "False":
+                    print("Invalid option")
+                    time.sleep(0.5)
+                    settings()
+                cfg['Settings']['verbose'] = verbose
+                with open("settings/config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Verbose set to {verbose}")
+                time.sleep(0.5)
+                settings()
+            if option == "4":
+                settings()
+            else:
+                print("Invalid option")
+                time.sleep(0.5)
+                settings()
+
+        if option == "6": # Save to file
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            print(f"Current directory for saved files: {cfg['Settings']['save_to_path']}\n1. Edit Save to file\n2. Go Back")
+            option = input("Enter the option: ")
+            if option == "1":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                save = input("Enter the directory for which you want your files to save in: ")
+                cfg['Settings']['save_to_path'] = save
+                with open("config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"New directory for saved files set to {save}")
+                time.sleep(0.5)
+                settings()
+            if option == "2":
+                settings()
+            else:
+                print("Invalid option")
+                time.sleep(0.5)
+                settings()
+
+        if option == "7": # Debug
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            print(f"Current Debug: {cfg['Settings']['debug']}\n\n1. Use Debug\n2. Don't Use Debug\n3. Edit Debug\n4. Go Back")
+            option = input("Enter the option: ")
+            if option == "1":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                debug = "True"
+                cfg['Settings']['debug'] = debug
+                with open("config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Debug set to {debug}")
+                time.sleep(0.5)
+                settings()
+            if option == "2":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                debug = "False"
+                cfg['Settings']['debug'] = debug
+                with open("config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print("Debug set to False")
+                time.sleep(0.5)
+                settings()
+            if option == "3":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                debug = input("Enter True/False: ")
+                cfg['Settings']['debug'] = debug
+                with open("config.yml", "w") as ymlfile:
+                    yaml.dump(cfg, ymlfile)
+                print(f"Debug set to {debug}")
+                time.sleep(0.5)
+                settings()
+            if option == "4":
+                settings()
+            else:
+                print("Invalid option")
+                time.sleep(0.5)
+                settings()
+
+        if option == "8": # Back
+            skidgithub()
+
+        elif option not in len(enumerate(opts)):
+            print("Invalid option")
+            time.sleep(0.5)
+            settings()    
+
     if option == '1': # Download All Repos from a User
         os.system('cls' if os.name == 'nt' else 'clear')
         username = input('Enter the username: ')
-        download_all(username)
+        download_all_repos(username)
 
     if option == "2": # Download Specific Named Repo from a User - download_specific(username, repo)
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -457,31 +690,6 @@ def skidgithub():
         repo = input('Enter the repo name: ')
         file_name = input('Enter the file name (including extension i.e. "index.html"): ')
 
-        def search_file_name(username, repo, file_name):
-            with open("settings/config.yml", "r") as ymlfile:
-                cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
-            r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/")
-            if r.status_code != 200:
-                print(f"Error: {str(r.status_code)} - {str(r.text)}")
-                sys.exit(1)
-            files = json.loads(r.text or r.content)
-            for file in files:
-                name = file["name"]
-                if name == file_name:
-                    print(f"Found {file_name}!")
-                    download_url = file["download_url"]
-                    if os.name == 'nt':
-                        os.system(f"curl -o {cfg['Settings']['save_to_path']}\{file_name} {download_url}")
-                    else:
-                        os.system(f"curl -o {cfg['Settings']['save_to_path']}/{file_name} {download_url}")
-                    print(f"Downloaded {file_name} to {cfg['Settings']['save_to_path']}!")
-                    print(f"Moved {file_name} to {cfg['Settings']['save_to_path']}!")
-                    print(f"Done!")
-                    input("")
-                    sys.exit(0)
-            print(f"Could not find {file_name}!")
-            input("")
-            sys.exit(1)
             
         search_file_name(username, repo, file_name)
 
@@ -492,280 +700,7 @@ def skidgithub():
 
         search_file_name_all(username, file_name)
 
-    if option == "7": # Settings
-        def settings():
-            os.system('cls' if os.name == 'nt' else 'clear')
-            logo()
-
-            with open("settings/config.yml", "r") as ymlfile:
-                cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)          
-                
-            print(textwrap.fill("Settings", width=50, initial_indent=' ' * 25, subsequent_indent=' ' * 25))
-            print(opts := (f'''
-                1. Proxy = {cfg['Settings']['proxy']}
-                2. User-Agent = {cfg['Settings']['user_agent']}
-                3. Threads = {cfg['Settings']['threads']}
-                4. Timeout = {cfg['Settings']['timeout']}
-                5. Verbose = {cfg['Settings']['verbose']}
-                6. Save to path = {cfg['Settings']['save_to_path']}
-                7. Debug = {cfg['Settings']['debug']}
-                8. Back
-            '''))
-
-            option = input("Enter the option: ")
-
-            if option == "1": # Proxy
-                os.system('cls' if os.name == 'nt' else 'clear')
-                logo()
-                print(f"Current Proxy: {cfg['Settings']['proxy']}\n\n1. Use Proxy (http, https, socks4, socks5, all), \n2. Don't Use Proxy\n3. Back")
-                option = input("Enter the option: ")
-                if option == "1":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    proxy = input("Enter the proxy (http, https, socks4, socks5, all): ")
-                    if proxy == "http":
-                        scrape_proxies("http")
-                    if proxy == "https":
-                        scrape_proxies("https")
-                    if proxy == "socks4":
-                        scrape_proxies("socks4")
-                    if proxy == "socks5":
-                        scrape_proxies("socks5")
-                    if proxy == "all":
-                        scrape_proxies("all")
-                    else:
-                        print("Invalid proxy type. Please create an issue on github if you think this is a bug.")
-                        input("Going back to settings...")
-                        settings()
-                    cfg['Settings']['proxy'] = proxy
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Proxy set to {proxy}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "2":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    cfg['Settings']['proxy'] = ""
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print("Proxy set to None")
-                    time.sleep(0.5)
-                    settings()
-                if option == "3":
-                    settings()
-                else:
-                    print("Invalid option")
-                    time.sleep(0.5)
-                    settings()
-
-            if option == "2": # User-Agent
-                os.system('cls' if os.name == 'nt' else 'clear')
-
-
-            if option == "3": # Threads
-                os.system('cls' if os.name == 'nt' else 'clear')
-                logo()
-                print(f"Current Threads: {cfg['Settings']['threads']}\n\n1. Use Threads\n2. Don't Use Threads\n3. Edit Threads\n4. Go Back")
-                option = input("Enter the option: ")
-                if option == "1":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    threads = input("Enter the threads: ")
-                    cfg['Settings']['threads'] = threads
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Threads set to {threads}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "2":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    cfg['Settings']['threads'] = ""
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print("Threads set to None")
-                    time.sleep(0.5)
-                    settings()
-                if option == "3":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    threads = input("Enter the threads: ")
-                    cfg['Settings']['threads'] = threads
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Threads set to {threads}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "4":
-                    settings()
-                else:
-                    print("Invalid option")
-                    time.sleep(0.5)
-                    settings()
-
-            if option == "4": # Timeout
-                os.system('cls' if os.name == 'nt' else 'clear')
-                logo()
-                print(f"Current Timeout: {cfg['Settings']['timeout']}\n\n1. Use Timeout\n2. Don't Use Timeout\n3. Edit Timeout\n4. Go Back")
-                option = input("Enter the option: ")
-                if option == "1":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    timeout = input("Enter the timeout: ")
-                    cfg['Settings']['timeout'] = timeout
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Timeout set to {timeout}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "2":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    cfg['Settings']['timeout'] = ""
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print("Timeout set to None")
-                    time.sleep(0.5)
-                    settings()
-                if option == "3":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    timeout = input("Enter the timeout: ")
-                    cfg['Settings']['timeout'] = timeout
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Timeout set to {timeout}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "4":
-                    settings()
-                else:
-                    print("Invalid option")
-                    time.sleep(0.5)
-                    settings()
-
-            if option == "5": # Verbose
-                os.system('cls' if os.name == 'nt' else 'clear')
-                logo()
-                print(f"Current Verbose: {cfg['Settings']['verbose']}\n\n1. Use Verbose\n2. Don't Use Verbose\n3. Edit Verbose\n4. Go Back")
-                option = input("Enter the option: ")
-                if option == "1":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    verbose = "True"
-                    cfg['Settings']['verbose'] = True 
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    verboselogs
-                    print(f"Verbose set to {verbose}")
-                    verboselogs.install()
-                    logging.basicConfig(level=verboselogs.VERBOSE)
-                    time.sleep(0.5)
-                    settings()
-                if option == "2":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    
-                    cfg['Settings']['verbose'] = "False"
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print("Verbose set to False")
-                    time.sleep(0.5)
-                    settings()
-                if option == "3":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    verbose = input("Enter True/False: ")
-                    if verbose != "True" or "False":
-                        print("Invalid option")
-                        time.sleep(0.5)
-                        settings()
-                    cfg['Settings']['verbose'] = verbose
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Verbose set to {verbose}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "4":
-                    settings()
-                else:
-                    print("Invalid option")
-                    time.sleep(0.5)
-                    settings()
-
-            if option == "6": # Save to file
-                os.system('cls' if os.name == 'nt' else 'clear')
-                logo()
-                print(f"Current directory for saved files: {cfg['Settings']['save_to_path']}\n1. Edit Save to file\n2. Go Back")
-                option = input("Enter the option: ")
-                if option == "1":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    save = input("Enter the directory for which you want your files to save in: ")
-                    cfg['Settings']['save_to_path'] = save
-                    with open("config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"New directory for saved files set to {save}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "2":
-                    settings()
-                else:
-                    print("Invalid option")
-                    time.sleep(0.5)
-                    settings()
-
-            if option == "7": # Debug
-                os.system('cls' if os.name == 'nt' else 'clear')
-                logo()
-                print(f"Current Debug: {cfg['Settings']['debug']}\n\n1. Use Debug\n2. Don't Use Debug\n3. Edit Debug\n4. Go Back")
-                option = input("Enter the option: ")
-                if option == "1":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    debug = "True"
-                    cfg['Settings']['debug'] = debug
-                    with open("config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Debug set to {debug}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "2":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    debug = "False"
-                    cfg['Settings']['debug'] = debug
-                    with open("config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print("Debug set to False")
-                    time.sleep(0.5)
-                    settings()
-                if option == "3":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    logo()
-                    debug = input("Enter True/False: ")
-                    cfg['Settings']['debug'] = debug
-                    with open("config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
-                    print(f"Debug set to {debug}")
-                    time.sleep(0.5)
-                    settings()
-                if option == "4":
-                    settings()
-                else:
-                    print("Invalid option")
-                    time.sleep(0.5)
-                    settings()
-
-            if option == "8": # Back
-                skidgithub()
-
-            elif option not in len(enumerate(opts)):
-                print("Invalid option")
-                time.sleep(0.5)
-                settings()                    
-
+    if option == "7": # Settings                
         settings()
 
     if option == "8": # Repost :troll:
