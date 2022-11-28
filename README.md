@@ -19,15 +19,7 @@ It is a simple python application that "skids" or simply, downloads off other Gi
 - [ ] User-Agent Support
 - [ ] Threading Support
 - [x] Settings
-- [ ] **Repost
-        [1] Download All Repos from a User
-        [2] Download Specific Named Repo from a User
-        [3] Download File Extension from a User and Repo 
-        [4] Download File Extension from a User (All Repos)
-        [5] Download/Find specific file name from a User and Repo
-        [6] Download/Find specific file name from a User (All Repos)
-###### * given username
-###### ** given username and repo name
+- [ ] Repost
 
 
 ## How to install: 
