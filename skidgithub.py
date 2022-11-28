@@ -10,8 +10,6 @@ import requests
 import yaml
 import textwrap
 
-
-
 def skidgithub():
     global version
 
