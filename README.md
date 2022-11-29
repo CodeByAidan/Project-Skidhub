@@ -15,7 +15,8 @@ It is a simple python application that "skids" or simply, downloads off other Gi
 - [x] Download File Extension from a User (All Repos)
 - [x] Download/Find specific file name from a User and Repo
 - [x] Download/Find specific file name from a User (All Repos)
-- [ ] Proxy Support & Proxy Scraper
+- [ ] Proxy Support 
+- [x] Proxy Scraper
 - [ ] User-Agent Support
 - [ ] Threading Support
 - [x] Settings
