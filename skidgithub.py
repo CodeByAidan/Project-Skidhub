@@ -713,5 +713,5 @@ def skidgithub():
         sys.exit(0)
         
 if __name__ == "__main__":
-   version = "1.0"
+   version = "2.0"
    skidgithub()
