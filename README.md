@@ -37,7 +37,8 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
 - [x] Settings menu (Allows you to change the settings of the application)
 - [x] Easy CLI (Easy to use!)
 - [x] Automation (Download with ease, no need to type in the commands every time! Just run the application and it will do the rest! 1 click and you're done!)
-- [ ] Error Handling (Currently working on this, will be added soon)  
+- [ ] Error Handling (Traceback errors and ways to fix them.)  
+- [ ] Search menu (Instead of downloading files, search for where they are and create link(s) directly to the said file)
 
 ## How to install
 
