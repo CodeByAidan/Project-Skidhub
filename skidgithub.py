@@ -9,6 +9,7 @@ from colorama import Fore, Style
 import requests
 import yaml
 import textwrap
+import webbrowser
 
 def skidgithub():
 
@@ -36,7 +37,7 @@ def skidgithub():
             print(f"{colorama.Fore.RED}Failed to check for updates!{colorama.Fore.RESET}")
             print(f"{colorama.Fore.RED}Error: {e}{colorama.Fore.RESET}")
             # check if it's because of the rate limit
-            if requests.get("https://api.github.com/rate_limit", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["resources"]["core"]["remaining"] == 0:
+            if requests.get("https://api.github.com/rate_limit").json()["resources"]["core"]["remaining"] == 0:
                 print(f"{colorama.Fore.RED}You have reached the GitHub API rate limit!{colorama.Fore.RESET}")
                 print(f"{colorama.Fore.RED}You can check your rate limit here: https://api.github.com/rate_limit{colorama.Fore.RESET}")
                 # convert line above to minutes
@@ -86,19 +87,10 @@ Settings:
         if config['Settings']['authorization_token'] in ["", "null", " "]:
             link = "https://github.com/settings/tokens/new?scopes=repo&description=Project-Skidhub"
 
-            # Based on their OS open the link in the browser - supported OS: Windows, Linux, Mac
-            if sys.platform == "win32":
-                os.startfile(link)
-            elif sys.platform == "darwin":
-                os.system(f"open {link}")
-            elif sys.platform == "linux":
-                os.system(f"xdg-open {link}")        
-            else:
-                print(f"{colorama.Fore.RED}Your OS is not supported!{colorama.Fore.RESET}")
-                print(f"{colorama.Fore.RED}Please generate a token here: {link}!{colorama.Fore.RESET}")
+            webbrowser.open(link, new=2)
 
             print(f"{colorama.Fore.RED}Please enter your GitHub authorization token!{colorama.Fore.RESET}")
-            print(f"{colorama.Fore.RED}Read the instructions in the README.md file!{colorama.Fore.RESET}")
+            print(f"{colorama.Fore.RED}If you need more help read the README.md file!{colorama.Fore.RESET}", end="\n")
             token = input("Token: ")
             config["Settings"]["authorization_token"] = token
             with open("settings/config.yml", "w") as file:
@@ -168,20 +160,25 @@ Settings:
             [4] Download File Extension from a User (All Repos)
             [5] Download/Find specific file name from a User and Repo
             [6] Download/Find specific file name from a User (All Repos)
-            [7] Settings 
-            [8] Help
-            [9] Exit
-            [0] Credits
+            [7] Search
+
+            [8] Settings 
+            [9] Help
+            [10] Credits
+            [11] Exit
         ''')
 
         option = input('Choose an option: ')
 
         def download_all_repos(username): #               (Option 1) - Download All Repos from a User
             try:
-                r = requests.get(f"https://api.github.com/users/{username}/repos")
+                r = requests.get(f"https://api.github.com/users/{username}/repos", headers={"authorization": f"token {config['Settings']['authorization_token']}"})
                 if r.status_code != 200:
-                    print(f"{colorama.Fore.RED}Error: {r.status_code}")
-                    sys.exit(1)
+                    print(f"{colorama.Fore.RED}Error status code: {r.status_code}")
+                    print(f"{colorama.Fore.RED}Error: {r.json()['message']}")
+                    print(f"{colorama.Fore.RED}To fix:\n1. Check your internet connection\n2. Check your token\n4. Check your spelling\n5. Check if the user exists\n6. If you are using a personal token, make sure it has the 'repo' scope.{colorama.Fore.RESET}")
+                    print(f"{colorama.Fore.RED}5. If you are still having issues, contact the developer{colorama.Fore.RESET}{colorama.Style.RESET}")
+                    input("")
 
                 repos = json.loads(r.text or r.content)
 
@@ -221,7 +218,8 @@ Settings:
 
         def download_specific(username, repo): #          (Option 2) - Download Specific Named Repo from a User
             try:
-                r = requests.get(f"https://api.github.com/repos/{username}/{repo}")
+                r = requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}) 
+
                 if r.status_code != 200:
                     print(f"Error: {str(r.status_code)}")
                     sys.exit(1)
@@ -244,7 +242,7 @@ Settings:
 
         def search_file_ext(username, repo, extension): # (Option 3) - Download File Extension from a User and Repo
             try:
-                r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents")
+                r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents", headers={"authorization": f"token {config['Settings']['authorization_token']}"})
                 if r.status_code != 200:
                     print(f"Error: {str(r.status_code)}")
                     sys.exit(1)
@@ -267,7 +265,7 @@ Settings:
         def download_all(username, extension): #          (Option 4) Download File Extension from a User (All Repos)
             with open("settings/config.yml", "r") as ymlfile:
                 cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
-            r = requests.get(f"https://api.github.com/users/{username}/repos")
+            r = requests.get(f"https://api.github.com/users/{username}/repos", headers={"authorization": f"token {config['Settings']['authorization_token']}"})
             if r.status_code != 200:
                 print(f"Error: {str(r.status_code)} - {str(r.text)}")
                 sys.exit(1)
@@ -307,7 +305,7 @@ Settings:
         def search_file_name(username, repo, file_name): #(Option 5) - Download/Find specific file name from a User and Repo
             with open("settings/config.yml", "r") as ymlfile:
                 cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
-            r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/")
+            r = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/", headers={"authorization": f"token {config['Settings']['authorization_token']}"})
             if r.status_code != 200:
                 print(f"Error: {str(r.status_code)} - {str(r.text)}")
                 sys.exit(1)
@@ -333,7 +331,7 @@ Settings:
         def search_file_name_all(username, file_name): #  (Option 6) - Download/Find specific file name from a User (All Repos)
             with open("settings/config.yml", "r") as ymlfile:
                 cfg = yaml.load(ymlfile, Loader=yaml.FullLoader) 
-            r = requests.get(f"https://api.github.com/users/{username}/repos")
+            r = requests.get(f"https://api.github.com/users/{username}/repos", headers={"authorization": f"token {config['Settings']['authorization_token']}"})
             if r.status_code != 200:
                 print(f"Error: {str(r.status_code)} - {str(r.text)}")
                 sys.exit(1)
@@ -373,7 +371,30 @@ Settings:
             input("")
             sys.exit(1)
 
-        def scrape_proxies(type): #                       (In Option 7 - Settings) - proxies [http, https, socks4, socks5, all]
+        def search(): #                                   (Option 7) - Search files/repos/users by Keyword
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            print("1. Search for a repo\n2. Search for a file name\n3. Search for a file extension\n4. Search for a folder name\n5. Go Back")
+            option = input("Enter the option: ")
+            if option == "1":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                logo()
+                username = input("Enter the username: ")
+                repo = input("Enter the repo name: ")
+                requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["name"], url = requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["html_url"] 
+                print(f"{Fore.GREEN}{Style.BRIGHT}Repo found! Link: {url}{Fore.RESET}{Style.RESET_ALL}")
+                input(f"{Fore.GREEN}{Style.BRIGHT}[1] Download [2] View Files [3] Back{Fore.RESET}{Style.RESET_ALL}")                    
+                if input == "1":
+                    os.system("git clone " + url)
+                if input == "2":
+                    # view files and folders in repo:
+                    # https://api.github.com/repos/{username}/{repo}/contents/PATH
+                    # https://api.github.com/repos/livxy/Project-Skidhub/contents/
+                    requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()
+                    #TODO: here
+                    print()
+
+        def scrape_proxies(type): #                       (In Option 8 - Settings) - Proxy Scraper [http, https, socks4, socks5, all]
             if type == "http":
                 if not os.path.isdir("settings/proxies/"): os.makedirs("settings/proxies/");
                 with open("settings/proxies/http.txt", "a+") as file:
@@ -385,8 +406,9 @@ Settings:
                             proxies.append(proxy)
                             file.write(str(proxy)+"\n")
                 print(f"Scraped `{len(proxies)}` HTTP proxies.")
-                input("Press enter to exit...")
-                sys.exit(0)
+                print(f"Saved to {os.path.abspath('settings/proxies/http.txt')}")
+                input("Press enter to go back...")
+                settings()
 
 
             if type == "https":
@@ -400,8 +422,9 @@ Settings:
                             proxies.append(proxy)
                             file.write(str(proxy)+"\n")
                 print(f"Scraped `{len(proxies)}` HTTPS proxies.")
-                input("Press enter to exit...")
-                sys.exit(0)  
+                print(f"Saved to {os.path.abspath('settings/proxies/https.txt')}")
+                input("Press enter to go back...")
+                settings()
 
             if type == "socks4":
                 if not os.path.isdir("settings/proxies/"): os.makedirs("settings/proxies/");
@@ -414,8 +437,9 @@ Settings:
                             proxies.append(proxy)
                             file.write(str(proxy)+"\n")
                 print(f"Scraped `{len(proxies)}` SOCKS4 proxies.")
-                input("Press enter to exit...")
-                sys.exit(0)   
+                print(f"Saved to {os.path.abspath('settings/proxies/socks4.txt')}")
+                input("Press enter to go back...")
+                settings()
 
             if type == "socks5":
                 if not os.path.isdir("settings/proxies/"): os.makedirs("settings/proxies/");
@@ -428,8 +452,9 @@ Settings:
                             proxies.append(proxy)
                             file.write(str(proxy)+"\n")
                 print(f"Scraped `{len(proxies)}` SOCKS5 proxies.")
-                input("Press enter to exit...")
-                sys.exit(0)
+                print(f"Saved to {os.path.abspath('settings/proxies/socks5.txt')}")
+                input("Press enter to go back...")
+                settings()
 
             if type == "all":
                 if not os.path.isdir("settings/proxies/"): os.makedirs("settings/proxies/");
@@ -442,10 +467,11 @@ Settings:
                             proxies.append(proxy)
                             file.write(str(proxy)+"\n")
                 print(f"Scraped `{len(proxies)}` HTTP, HTTPS, SOCKS4 AND SOCKS5 proxies.")
-                input("Press enter to exit...")
-                sys.exit(0)
+                print(f"Saved to {os.path.abspath('settings/proxies/all.txt')}")
+                input("Press enter to go back...")
+                settings()
 
-        def settings(): #                                 (Option 7) - Settings
+        def settings(): #                                 (Option 8) - Settings
             os.system('cls' if os.name == 'nt' else 'clear')
             logo()
 
@@ -454,7 +480,7 @@ Settings:
 
             print(textwrap.fill("Settings", width=50, initial_indent=' ' * 25, subsequent_indent=' ' * 25))
             print(opts := (f'''
-                1. Proxy Scrapper = {cfg['Settings']['proxy']}
+                1. Proxy Scrapper (HTTP, HTTPS, SOCKS4, SOCKS5, ALL)
                 2. Verbose = {cfg['Settings']['verbose']}
                 3. Save to path = {cfg['Settings']['save_to_path']}
                 4. Debug = {cfg['Settings']['debug']}
@@ -466,7 +492,7 @@ Settings:
             if option == "1": # Proxy
                 os.system('cls' if os.name == 'nt' else 'clear')
                 logo()
-                print(f"Current Proxy: {cfg['Settings']['proxy']}\n\n1. Scrape Proxy (http, https, socks4, socks5, all), \n2. Don't Use Proxy [FUTURE FEATURE]\n3. Back")
+                print(f"1. Scrape Proxy (http, https, socks4, socks5, all), \n2. Don't Use Proxy [FUTURE FEATURE]\n3. Back")
                 option = input("Enter the option: ")
                 if option == "1":
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -486,9 +512,9 @@ Settings:
                         print("Invalid proxy type. Please create an issue on github if you think this is a bug.")
                         input("Going back to settings...")
                         settings()
-                    cfg['Settings']['proxy'] = proxy
-                    with open("settings/config.yml", "w") as ymlfile:
-                        yaml.dump(cfg, ymlfile)
+                    # cfg['Settings']['proxy'] = proxy
+                    # with open("settings/config.yml", "w") as ymlfile:
+                    #     yaml.dump(cfg, ymlfile)
                     # print(f"Proxy set to {proxy}")
                     time.sleep(0.5)
                     settings()
@@ -613,8 +639,8 @@ Settings:
                     with open("config.yml", "w") as ymlfile:
                         yaml.dump(cfg, ymlfile)
                     print(f"Debug set to {debug}")
-                    time.sleep(0.5)
-                    settings()
+                time.sleep(0.5)
+                settings()    
                 if option == "4":
                     settings()
                 else:
@@ -639,7 +665,7 @@ Settings:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 logo()
                 print("Skid Github is a tool that can be used to find sensitive files on github.")
-                time.sleep(0.5)
+                input("Press enter to go back")
                 help()
             if option == "2":
                 os.system('cls' if os.name == 'nt' else 'clear')
@@ -697,19 +723,21 @@ Settings:
 
             search_file_name_all(username, file_name)
 
-        if option == "7": # Settings                
+        if option == "7": # Search by Keyword - Users/Repos/Files
+            # os.system('cls' if os.name == 'nt' else 'clear')
+            # logo()
+            # search()
+            print("In development sorry!")
+            time.sleep(1)
+            after_startup()
+
+        if option == "8": # Settings                
             settings()
 
-        if option == "8": # Help
+        if option == "9": # Help
             help()
-
-        if option == "9": # Exit
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print(f"Exiting...{Fore.RESET}{Style.RESET_ALL}")
-            time.sleep(0.5)
-            sys.exit(0)
             
-        if option == "0": # Credits
+        if option == "10": # Credits
             os.system('cls' if os.name == 'nt' else 'clear')
             logo()
             # In the print statement-line below-use colorama to make the text colorful
@@ -729,6 +757,13 @@ Settings:
             {Fore.RED}{Style.BRIGHT}Press enter to go back{Fore.RESET}{Style.RESET_ALL}
             """)
             input(); os.system("cls" if os.name == "nt" else "clear"); after_startup() 
+
+        if option == "11": # Exit
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(f"Exiting...{Fore.RESET}{Style.RESET_ALL}")
+            time.sleep(0.5)
+            sys.exit(0)
+
     after_startup()
             
 if __name__ == "__main__":
