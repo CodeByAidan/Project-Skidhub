@@ -2,13 +2,14 @@
 
 <p align="center">
 <br>
-<a href="https://github.com/livxy/Bruh-Bot/issues/new?assignees=&labels=&template=bug_report.md&title=">Report bug</a>
+<a href="https://github.com/livxy/Project-Skidhub
+/issues/new?assignees=&labels=&template=bug_report.md&title=">Report bug</a>
 ·
-<a href="https://github.com/livxy/Bruh-Bot/issues/new?assignees=&labels=&template=feature_request.md&title=">Request feature</a>
+<a href="https://github.com/livxy/Project-Skidhub/issues/new?assignees=&labels=&template=feature_request.md&title=">Request feature</a>
 <br><br>
-<a href="https://github.com/livxy/Bruh-Bot"><img alt="Code Size" src="https://img.shields.io/github/repo-size/livxy/Bruh-Bot" /></a>
-<a href="https://github.com/livxy/Bruh-Bot"><img alt="Code Size" src="https://img.shields.io/github/directory-file-count/livxy/Bruh-Bot" /></a>
-<a href="https://github.com/livxy/Bruh-Bot"><img alt="Code Size" src="https://tokei.ekzhang.com/b1/github/livxy/Bruh-Bot" /></a>
+<a href="https://github.com/livxy/Project-Skidhub"><img alt="Repo Size" src="https://img.shields.io/github/repo-size/livxy/Project-Skidhub" /></a>
+<a href="https://github.com/livxy/Project-Skidhub"><img alt="File Count" src="https://img.shields.io/github/directory-file-count/livxy/Project-Skidhub" /></a>
+<a href="https://github.com/livxy/Project-Skidhub"><img alt="Code Size" src="https://tokei.ekzhang.com/b1/github/livxy/Project-Skidhub" /></a>
 </p>
 
 Introducing **_Project-Skidhub_**! The simple user-friendly python script/application that does the hard Git operations through ease!
