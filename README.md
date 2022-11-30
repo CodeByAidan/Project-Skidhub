@@ -7,9 +7,14 @@
 ·
 <a href="https://github.com/livxy/Project-Skidhub/issues/new?assignees=&labels=&template=feature_request.md&title=">Request feature</a>
 <br><br>
+<div align="center">
 <a href="https://github.com/livxy/Project-Skidhub"><img alt="Repo Size" src="https://img.shields.io/github/repo-size/livxy/Project-Skidhub" /></a>
 <a href="https://github.com/livxy/Project-Skidhub"><img alt="File Count" src="https://img.shields.io/github/directory-file-count/livxy/Project-Skidhub" /></a>
 <a href="https://github.com/livxy/Project-Skidhub"><img alt="Code Size" src="https://tokei.ekzhang.com/b1/github/livxy/Project-Skidhub" /></a>
+
+[![CodeQL](https://github.com/livxy/Project-Skidhub/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/livxy/Project-Skidhub/actions/workflows/codeql.yml) 
+
+</div>
 </p>
 
 Introducing **_Project-Skidhub_**! The simple user-friendly python script/application that does the hard Git operations through ease!
@@ -73,6 +78,30 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
 - Paste the token into the application on the first start-up (or go to /settings/config.yml and paste it into the "authorization_token" section. No quotes needed)
 - Click "Save"
 - Restart the application
+
+## Tree
+```graphql
+├─── .gitignore
+├─── CODE_OF_CONDUCT.md
+├─── LICENSE
+├─── README.md
+├─── requirements.txt
+├─── SECURITY.md
+├─── skidgithub.py
+│
+├───.github
+│   ├─── dependabot.yml
+│   │
+│   └─── workflows
+│        ├─── codeql.yml
+│        └─── dependency-review.yml
+│
+├─── Downloads
+└─── settings
+     └─── config.yml
+
+```
+
 
 ## Agreement
 
