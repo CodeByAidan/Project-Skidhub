@@ -38,7 +38,6 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
 - [x] Easy CLI (Easy to use!)
 - [x] Automation (Download with ease, no need to type in the commands every time! Just run the application and it will do the rest! 1 click and you're done!)
 - [ ] Error Handling (Currently working on this, will be added soon)  
-- [ ] Repost (Currently working on this, will be added soon)
 
 ## How to install
 
