@@ -1,4 +1,21 @@
-# Project-Skidhub
+<h1 align="center">Project-Skidhub</h1>
+
+<p align="center">
+<br>
+<a href="https://github.com/livxy/Project-Skidhub
+/issues/new?assignees=&labels=&template=bug_report.md&title=">Report bug</a>
+·
+<a href="https://github.com/livxy/Project-Skidhub/issues/new?assignees=&labels=&template=feature_request.md&title=">Request feature</a>
+<br><br>
+<div align="center">
+<a href="https://github.com/livxy/Project-Skidhub"><img alt="Repo Size" src="https://img.shields.io/github/repo-size/livxy/Project-Skidhub" /></a>
+<a href="https://github.com/livxy/Project-Skidhub"><img alt="File Count" src="https://img.shields.io/github/directory-file-count/livxy/Project-Skidhub" /></a>
+<a href="https://github.com/livxy/Project-Skidhub"><img alt="Code Size" src="https://tokei.ekzhang.com/b1/github/livxy/Project-Skidhub" /></a>
+
+[![CodeQL](https://github.com/livxy/Project-Skidhub/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/livxy/Project-Skidhub/actions/workflows/codeql.yml) 
+
+</div>
+</p>
 
 Introducing **_Project-Skidhub_**! The simple user-friendly python script/application that does the hard Git operations through ease!
 
@@ -20,8 +37,8 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
 - [x] Settings menu (Allows you to change the settings of the application)
 - [x] Easy CLI (Easy to use!)
 - [x] Automation (Download with ease, no need to type in the commands every time! Just run the application and it will do the rest! 1 click and you're done!)
-- [ ] Error Handling (Currently working on this, will be added soon)  
-- [ ] Repost (Currently working on this, will be added soon)
+- [ ] Error Handling (Traceback errors and ways to fix them.)  
+- [ ] Search menu (Instead of downloading files, search for where they are and create link(s) directly to the said file)
 
 ## How to install
 
@@ -39,8 +56,8 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python get-pip.py
   ```
-
-1. Run the python script:
+ 
+2. Run the python script:
   
   Type in your terminal/command-prompt:
 
@@ -48,9 +65,9 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
   python skidgithub.py
   ```
 
-1. Get a GitHub token:
+3. Get a GitHub token:
   (If you do not want to use a token, you can skip this step)
-  (Skip this step if you downloaded v2.1 or higher, and the auto-token feature was used to get a token for you.)
+  (Skip this step if you downloaded v3.0 or higher, and the auto-token feature was used to get a token for you.)
 
 - Go to [GitHub then Settings then Tokens](https://github.com/settings/tokens)
 - Click on "Generate new token" then click "Generate new token (classic)"
@@ -61,6 +78,30 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
 - Paste the token into the application on the first start-up (or go to /settings/config.yml and paste it into the "authorization_token" section. No quotes needed)
 - Click "Save"
 - Restart the application
+
+## Tree
+```graphql
+├─── .gitignore
+├─── CODE_OF_CONDUCT.md
+├─── LICENSE
+├─── README.md
+├─── requirements.txt
+├─── SECURITY.md
+├─── skidgithub.py
+│
+├───.github
+│   ├─── dependabot.yml
+│   │
+│   └─── workflows
+│        ├─── codeql.yml
+│        └─── dependency-review.yml
+│
+├─── Downloads
+└─── settings
+     └─── config.yml
+
+```
+
 
 ## Agreement
 
