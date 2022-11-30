@@ -732,7 +732,7 @@ Settings:
     after_startup()
             
 if __name__ == "__main__":
-    version = "2.0"
+    version = "3.0"
     try: 
         skidgithub()
     except KeyboardInterrupt:
