@@ -67,7 +67,7 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
 
 3. Get a GitHub token:
   (If you do not want to use a token, you can skip this step)
-  (Skip this step if you downloaded v2.1 or higher, and the auto-token feature was used to get a token for you.)
+  (Skip this step if you downloaded v3.0 or higher, and the auto-token feature was used to get a token for you.)
 
 - Go to [GitHub then Settings then Tokens](https://github.com/settings/tokens)
 - Click on "Generate new token" then click "Generate new token (classic)"
