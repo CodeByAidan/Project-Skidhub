@@ -56,8 +56,8 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python get-pip.py
   ```
-
-1. Run the python script:
+ 
+2. Run the python script:
   
   Type in your terminal/command-prompt:
 
@@ -65,7 +65,7 @@ Simple CLI program that is extremely easy to use and user-friendly. It downloads
   python skidgithub.py
   ```
 
-1. Get a GitHub token:
+3. Get a GitHub token:
   (If you do not want to use a token, you can skip this step)
   (Skip this step if you downloaded v2.1 or higher, and the auto-token feature was used to get a token for you.)
 
