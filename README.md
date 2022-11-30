@@ -1,12 +1,10 @@
 # Project-Skidhub
 
-Want to be a absolute degen? Well I have the application just for you! Introducing **_Project Skidhub_**!
-
-![real timof](https://github.com/livxy/Project-Skidhub/blob/main/real.gif)
+Introducing **_Project-Skidhub_**! The simple user-friendly python script/application that does the hard Git operations through ease!
 
 ## What is it?
 
-It is a simple python application that "skids" or simply, downloads off other GitHub accounts! **(SEE FEATURES BELOW FOR MORE CONTEXT)**
+Simple CLI program that is extremely easy to use and user-friendly. It downloads specific files, specific file extensions, specific repos, etc. It also has search abilities to find those specific files that you have been looking for. No need to search for that needle in the haystack anymore! :smile:
 
 ## Current Features
 
