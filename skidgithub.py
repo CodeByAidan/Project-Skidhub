@@ -13,6 +13,7 @@ import webbrowser
 
 def skidgithub():
 
+    #TODO: Use 'yield'W to return results as they are found instead of waiting for all results to be found
     #TODO: add a search menu (search for users, repos, files, etc)
     #TODO: add a "download" menu
     #TODO: Convert to tkinker GUI - Use pyinstaller to make an executable file
@@ -656,7 +657,7 @@ Settings:
                 time.sleep(0.5)
                 settings()    
 
-        def help(): #                                     (Option 8) - Help
+        def help(): #                                     (Option 9) - Help
             os.system('cls' if os.name == 'nt' else 'clear')
             logo()
             print("1. What is Skid Github?\n2. How to use Skid Github?\n3. Go Back")
