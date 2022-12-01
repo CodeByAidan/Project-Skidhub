@@ -13,10 +13,20 @@ import webbrowser
 
 def skidgithub():
 
-    #TODO: Use 'yield'W to return results as they are found instead of waiting for all results to be found
+    #TODO: Major:
+    #TODO: Finish functions: lines 384 - 434 (search function)
+    #TODO: Finish lines: 397 - 402 (a)
+
+    #TODO: Minor:
+    #TODO: Use 'yield' to return results as they are found instead of waiting for all results to be found
     #TODO: add a search menu (search for users, repos, files, etc)
     #TODO: add a "download" menu
     #TODO: Convert to tkinker GUI - Use pyinstaller to make an executable file
+    #TODO: Add documentation to "save_to_path" & "save_to_path_automatic"
+    #TODO: Add a debug 2.0 mode that prints out the raw json data to the console, and saves to: "Downloads/json_data/{repo}.json"
+    #      code: print(json.dumps(repo_data, indent=4, sort_keys=True))
+    #TODO: Setting called time_exec - if true, print the time it took to execute a function:
+    #      print("Completed in: " + str(time.time() - start_time))
 
     def check_version():
         global version
@@ -229,7 +239,7 @@ Settings:
                 clone_url = repo["clone_url"]
                 print(f"{name}: {clone_url}")
                 os.system(f"git clone {clone_url} {config['Settings']['save_to_path']}")
-                print("Completed in !\nPress Enter To Exit...")
+                # print("Completed in: " + str(time.time() - start_time))
                 input("")
                 sys.exit(0)
             except KeyboardInterrupt:
@@ -382,18 +392,47 @@ Settings:
                 logo()
                 username = input("Enter the username: ")
                 repo = input("Enter the repo name: ")
-                requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["name"], url = requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["html_url"] 
-                print(f"{Fore.GREEN}{Style.BRIGHT}Repo found! Link: {url}{Fore.RESET}{Style.RESET_ALL}")
-                input(f"{Fore.GREEN}{Style.BRIGHT}[1] Download [2] View Files [3] Back{Fore.RESET}{Style.RESET_ALL}")                    
-                if input == "1":
-                    os.system("git clone " + url)
-                if input == "2":
+                name = requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["name"]
+                url = requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["html_url"]
+
+                results = requests.get(f"https://api.github.com/repos/{username}/{repo}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()
+                print(f"{results}")
+                # Create a .json file and save the response
+                with open(f"{name}.json", "w") as f:
+                    json.dump(results, f, indent=4)
+                print(f"Saved {name}.json!")
+                
+                print(f"{Fore.GREEN}{Style.BRIGHT}Repo: '{name}' found!\n Link: {url}{Fore.RESET}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}{Style.BRIGHT}[1] Download [2] View Files [3] Back{Fore.RESET}{Style.RESET_ALL}")
+                inp = input("Enter the option: ")                    
+                if inp == "1":
+                    os.system("git clone " + url + {config['Settings']['save_to_path']})
+                    print(f"Downloaded {name} to {config['Settings']['save_to_path']}!")
+                if inp == "2":
                     # view files and folders in repo:
                     # https://api.github.com/repos/{username}/{repo}/contents/PATH
                     # https://api.github.com/repos/livxy/Project-Skidhub/contents/
                     requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()
-                    #TODO: here
-                    print()
+                    # Print out tree of files and folders
+                    print(f"Files and Folders in {name}:")
+                    print(f"{Fore.GREEN}{Style.BRIGHT}Files:{Fore.RESET}{Style.RESET_ALL}")
+                    for file in requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["files"]:
+                        print(f"{file}")
+                    print(f"{Fore.GREEN}{Style.BRIGHT}Folders:{Fore.RESET}{Style.RESET_ALL}")
+                    folders = requests.get(f"https://api.github.com/repos/{username}/{repo}/contents/", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["folders"]
+                    for folder in folders:
+                        print(f"{folder}")
+                    inp2 = input("Would you like to download a file? (y/n): ")
+                    if inp2 == "y":
+                        file = input("Enter the file name: ")
+                        # download file
+                        # https://raw.githubusercontent.com/{username}/{repo}/master/{file}
+                        requests.get(f"https://raw.githubusercontent.com/{username}/{repo}/master/{file}", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()
+                        print(f"Downloaded {file} to {config['Settings']['save_to_path']}!")
+                    if inp2 == "n":
+                        search()
+                if inp == "3":
+                    search()
 
         def scrape_proxies(type): #                       (In Option 8 - Settings) - Proxy Scraper [http, https, socks4, socks5, all]
             if type == "http":
@@ -610,26 +649,24 @@ Settings:
             if option == "4": # Debug
                 os.system('cls' if os.name == 'nt' else 'clear')
                 logo()
-                print(f"Current Debug: {cfg['Settings']['debug']}\n\n1. Use Debug\n2. Don't Use Debug\n3. Edit Debug\n4. Go Back")
+                print(f"Current Debug: {config['Settings']['debug']}\n\n1. Use Debug\n2. Don't Use Debug\n3. Edit Debug\n4. Go Back")
                 option = input("Enter the option: ")
                 if option == "1":
                     os.system('cls' if os.name == 'nt' else 'clear')
                     logo()
-                    debug = "True"
-                    cfg['Settings']['debug'] = debug
-                    with open("config.yml", "w") as ymlfile:
+                    cfg['Settings']['debug'] = True 
+                    with open("settings/config.yml", "w") as ymlfile:
                         yaml.dump(cfg, ymlfile)
-                    print(f"Debug set to {debug}")
+                    print(f"Debug set to True!")
                     time.sleep(0.5)
                     settings()
                 if option == "2":
                     os.system('cls' if os.name == 'nt' else 'clear')
                     logo()
-                    debug = "False"
-                    cfg['Settings']['debug'] = debug
-                    with open("config.yml", "w") as ymlfile:
+                    cfg['Settings']['debug'] = False
+                    with open("settings/config.yml", "w") as ymlfile:
                         yaml.dump(cfg, ymlfile)
-                    print("Debug set to False")
+                    print("Debug set to False!")
                     time.sleep(0.5)
                     settings()
                 if option == "3":
@@ -637,11 +674,11 @@ Settings:
                     logo()
                     debug = input("Enter True/False: ")
                     cfg['Settings']['debug'] = debug
-                    with open("config.yml", "w") as ymlfile:
+                    with open("settings/config.yml", "w") as ymlfile:
                         yaml.dump(cfg, ymlfile)
                     print(f"Debug set to {debug}")
-                time.sleep(0.5)
-                settings()    
+                    time.sleep(0.5)
+                    settings()    
                 if option == "4":
                     settings()
                 else:
@@ -725,10 +762,9 @@ Settings:
             search_file_name_all(username, file_name)
 
         if option == "7": # Search by Keyword - Users/Repos/Files
-            # os.system('cls' if os.name == 'nt' else 'clear')
-            # logo()
-            # search()
-            print("In development sorry!")
+            os.system('cls' if os.name == 'nt' else 'clear')
+            logo()
+            search()
             time.sleep(1)
             after_startup()
 

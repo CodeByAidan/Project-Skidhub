@@ -4,3 +4,4 @@ dist/
 settings/
 Downloads/
 tests/
+*.json
