@@ -18,7 +18,7 @@ def skidgithub():
 
     def check_version():
         global version
-        
+
         try:
             print(f"{colorama.Fore.YELLOW}Checking for updates...{colorama.Style.RESET_ALL}")
             latest_version = requests.get("https://api.github.com/repos/livxy/Project-Skidhub/releases/latest", headers={"authorization": f"token {config['Settings']['authorization_token']}"}).json()["tag_name"]
@@ -128,13 +128,13 @@ Settings:
                     print(f"{colorama.Fore.RED}Please generate a new token!{colorama.Fore.RESET}")
                     auth_checker()
                     sys.exit()
-    
+
     auth_checker()
     check_version()
     # End of startup
 
     def after_startup():
-        
+
         def logo():
             os.system('cls' if os.name == 'nt' else 'clear')
             print(colorama.Fore.LIGHTGREEN_EX + '''
@@ -708,7 +708,7 @@ Settings:
             print(f"Exiting...{Fore.RESET}{Style.RESET_ALL}")
             time.sleep(0.5)
             sys.exit(0)
-            
+
         if option == "0": # Credits
             os.system('cls' if os.name == 'nt' else 'clear')
             logo()
